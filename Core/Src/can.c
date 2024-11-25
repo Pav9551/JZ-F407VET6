@@ -320,6 +320,29 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
   }
 }
 
-/* USER CODE BEGIN 1 */
+/* USER CODE BEGIN 1 не работает эхо*/
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1)
+{
+    CAN_RxHeaderTypeDef RxHeader;
+    uint8_t RxData[8];
 
+    if (HAL_CAN_GetRxMessage(hcan1, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
+    {
+        Error_Handler();
+    }
+
+    // Forward the received CAN2 message to CAN1
+    CAN_TxHeaderTypeDef TxHeader;
+    uint32_t TxMailbox;
+
+    TxHeader.DLC = RxHeader.DLC;
+    TxHeader.IDE = RxHeader.IDE;
+    TxHeader.StdId = RxHeader.StdId;
+    TxHeader.RTR = RxHeader.RTR;
+
+    if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, RxData, &TxMailbox) != HAL_OK)
+    {
+        Error_Handler();
+    }
+}
 /* USER CODE END 1 */
