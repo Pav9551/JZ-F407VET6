@@ -28,7 +28,7 @@
 #include "spi.h"
 #include "usart.h"
 #include "usb_device.h"
-#include "usb_host.h"
+
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -110,7 +110,7 @@ int main(void)
   MX_USB_DEVICE_Init();
   MX_FATFS_Init();
   MX_CRC_Init();
-  MX_USB_HOST_Init();
+
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
 
@@ -121,7 +121,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    MX_USB_HOST_Process();
+
 
     /* USER CODE BEGIN 3 */
   }
