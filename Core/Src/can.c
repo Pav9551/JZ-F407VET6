@@ -19,7 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "can.h"
-#include "stdio.h"
+
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
@@ -80,7 +80,7 @@ void MX_CAN1_Init(void)
       }
 
       /* Activate CAN notifications */
-      if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY) != HAL_OK)
+      if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY ) != HAL_OK)
       {
           // Notification Error
           Error_Handler();
@@ -101,8 +101,15 @@ void MX_CAN1_Init(void)
           // Transmission request Error
           Error_Handler();
       }
-      HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_ERROR | CAN_IT_BUSOFF | CAN_IT_LAST_ERROR_CODE);
+
+      if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_ERROR | CAN_IT_BUSOFF | CAN_IT_LAST_ERROR_CODE ) != HAL_OK)
+            {
+                // Notification Error
+                Error_Handler();
+            }
+
   /* USER CODE END CAN1_Init 2 */
+
 }
 /* CAN2 init function */
 void MX_CAN2_Init(void)
@@ -178,7 +185,12 @@ void MX_CAN2_Init(void)
           // Transmission request Error
           Error_Handler();
       }
-      HAL_CAN_ActivateNotification(&hcan2, CAN_IT_RX_FIFO1_MSG_PENDING | CAN_IT_ERROR | CAN_IT_BUSOFF | CAN_IT_LAST_ERROR_CODE);
+      if (HAL_CAN_ActivateNotification(&hcan2, CAN_IT_RX_FIFO1_MSG_PENDING | CAN_IT_ERROR | CAN_IT_BUSOFF | CAN_IT_LAST_ERROR_CODE ) != HAL_OK)
+                  {
+                      // Notification Error
+                      Error_Handler();
+                  }
+
   /* USER CODE END CAN2_Init 2 */
 
 }
@@ -213,12 +225,8 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
     /* CAN1 interrupt Init */
-    HAL_NVIC_SetPriority(CAN1_TX_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(CAN1_TX_IRQn);
     HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn);
-    HAL_NVIC_SetPriority(CAN1_RX1_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(CAN1_RX1_IRQn);
     HAL_NVIC_SetPriority(CAN1_SCE_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(CAN1_SCE_IRQn);
   /* USER CODE BEGIN CAN1_MspInit 1 */
@@ -252,8 +260,6 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     /* CAN2 interrupt Init */
     HAL_NVIC_SetPriority(CAN2_TX_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(CAN2_TX_IRQn);
-    HAL_NVIC_SetPriority(CAN2_RX0_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(CAN2_RX0_IRQn);
     HAL_NVIC_SetPriority(CAN2_RX1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(CAN2_RX1_IRQn);
     HAL_NVIC_SetPriority(CAN2_SCE_IRQn, 0, 0);
@@ -285,9 +291,7 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
     HAL_GPIO_DeInit(GPIOD, GPIO_PIN_0|GPIO_PIN_1);
 
     /* CAN1 interrupt Deinit */
-    HAL_NVIC_DisableIRQ(CAN1_TX_IRQn);
     HAL_NVIC_DisableIRQ(CAN1_RX0_IRQn);
-    HAL_NVIC_DisableIRQ(CAN1_RX1_IRQn);
     HAL_NVIC_DisableIRQ(CAN1_SCE_IRQn);
   /* USER CODE BEGIN CAN1_MspDeInit 1 */
 
@@ -313,7 +317,6 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 
     /* CAN2 interrupt Deinit */
     HAL_NVIC_DisableIRQ(CAN2_TX_IRQn);
-    HAL_NVIC_DisableIRQ(CAN2_RX0_IRQn);
     HAL_NVIC_DisableIRQ(CAN2_RX1_IRQn);
     HAL_NVIC_DisableIRQ(CAN2_SCE_IRQn);
   /* USER CODE BEGIN CAN2_MspDeInit 1 */
@@ -323,21 +326,24 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 }
 
 /* USER CODE BEGIN 1 */
-void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)//can1
 {
     CAN_RxHeaderTypeDef RxHeader;
     uint8_t RxData[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};  // Example data
-    if(HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &RxHeader, RxData) == HAL_OK)
+    if(HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) == HAL_OK)
     {
         HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_13);
     }
-    CAN_RxHeaderTypeDef RxHeader2;
-    uint8_t RxData2[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};  // Example data
-    if(HAL_CAN_GetRxMessage(&hcan2, CAN_RX_FIFO1, &RxHeader2, RxData2) == HAL_OK)
-        {
-            HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_13);
-        }
-
+}
+void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)//can2
+{
+    CAN_RxHeaderTypeDef RxHeader;
+    uint8_t RxData[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};  // Example data
+    if(HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO1, &RxHeader, RxData) == HAL_OK)
+    {
+        //HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_13);
+    }
+    HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_13);
 }
 
 /* USER CODE END 1 */
