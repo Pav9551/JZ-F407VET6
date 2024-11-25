@@ -320,7 +320,7 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
   }
 }
 
-/* USER CODE BEGIN 1 не работает эхо*/
+/* USER CODE BEGIN 1 не работает эхо */
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1)
 {
     CAN_RxHeaderTypeDef RxHeader;
