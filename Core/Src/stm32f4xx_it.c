@@ -57,7 +57,6 @@
 /* External variables --------------------------------------------------------*/
 extern ETH_HandleTypeDef heth;
 extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
-extern HCD_HandleTypeDef hhcd_USB_OTG_HS;
 extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;
 extern DMA_HandleTypeDef hdma_sdio;
@@ -418,16 +417,6 @@ void OTG_FS_IRQHandler(void)
 
 /**
   * @brief This function handles USB On The Go HS End Point 1 Out global interrupt.
-  */
-
-
-/**
-  * @brief This function handles USB On The Go HS End Point 1 In global interrupt.
-  */
-
-
-/**
-  * @brief This function handles USB On The Go HS global interrupt.
   */
 
 
