@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    can.c
+  * @file    usart.c
   * @brief   This file provides code for the configuration
-  *          of the CAN instances.
+  *          of the USART instances.
   ******************************************************************************
   * @attention
   *
@@ -18,331 +18,180 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include "can.h"
-#include "stdio.h"
+#include "usart.h"
+
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
 
-CAN_HandleTypeDef hcan1;
-CAN_HandleTypeDef hcan2;
+UART_HandleTypeDef huart1;
+UART_HandleTypeDef huart2;
 
-/* CAN1 init function */
-void MX_CAN1_Init(void)
+/* USART1 init function */
+
+void MX_USART1_UART_Init(void)
 {
 
-  /* USER CODE BEGIN CAN1_Init 0 */
+  /* USER CODE BEGIN USART1_Init 0 */
 
-  /* USER CODE END CAN1_Init 0 */
+  /* USER CODE END USART1_Init 0 */
 
-  /* USER CODE BEGIN CAN1_Init 1 */
+  /* USER CODE BEGIN USART1_Init 1 */
 
-  /* USER CODE END CAN1_Init 1 */
-  hcan1.Instance = CAN1;
-  hcan1.Init.Prescaler = 6;
-  hcan1.Init.Mode = CAN_MODE_NORMAL;
-  hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan1.Init.TimeSeg1 = CAN_BS1_6TQ;
-  hcan1.Init.TimeSeg2 = CAN_BS2_7TQ;
-  hcan1.Init.TimeTriggeredMode = DISABLE;
-  hcan1.Init.AutoBusOff = DISABLE;
-  hcan1.Init.AutoWakeUp = DISABLE;
-  hcan1.Init.AutoRetransmission = DISABLE;
-  hcan1.Init.ReceiveFifoLocked = DISABLE;
-  hcan1.Init.TransmitFifoPriority = DISABLE;
-  if (HAL_CAN_Init(&hcan1) != HAL_OK)
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN CAN1_Init 2 */
-  /* CAN filter configuration */
-      CAN_FilterTypeDef canFilterConfig;
-      canFilterConfig.FilterActivation = ENABLE;
-      canFilterConfig.FilterBank = 0;  // Use bank 0
-      canFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-      canFilterConfig.FilterIdHigh = 0x0000;
-      canFilterConfig.FilterIdLow = 0x0000;
-      canFilterConfig.FilterMaskIdHigh = 0x0000;
-      canFilterConfig.FilterMaskIdLow = 0x0000;
-      canFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-      canFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-      if (HAL_CAN_ConfigFilter(&hcan1, &canFilterConfig) != HAL_OK)
-      {
-          // Filter configuration Error
-          Error_Handler();
-      }
+  /* USER CODE BEGIN USART1_Init 2 */
 
-      /* Start the CAN peripheral */
-      if (HAL_CAN_Start(&hcan1) != HAL_OK)
-      {
-          // Start Error
-          Error_Handler();
-      }
+  /* USER CODE END USART1_Init 2 */
 
-      /* Activate CAN notifications */
-      if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY) != HAL_OK)
-      {
-          // Notification Error
-          Error_Handler();
-      }
-
-      /* Transmission */
-      CAN_TxHeaderTypeDef TxHeader;
-      uint32_t TxMailbox;
-      uint8_t TxData[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};  // Example data
-
-      TxHeader.DLC = 8;  // Data length
-      TxHeader.IDE = CAN_ID_STD;  // Using standard identifier
-      TxHeader.StdId = 0x523;  // Standard identifier of the message
-      TxHeader.RTR = CAN_RTR_DATA;  // Message is a data frame
-
-      if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, TxData, &TxMailbox) != HAL_OK)
-      {
-          // Transmission request Error
-          Error_Handler();
-      }
-  /* USER CODE END CAN1_Init 2 */
 }
-/* CAN2 init function */
-void MX_CAN2_Init(void)
+/* USART2 init function */
+
+void MX_USART2_UART_Init(void)
 {
 
-  /* USER CODE BEGIN CAN2_Init 0 */
+  /* USER CODE BEGIN USART2_Init 0 */
 
-  /* USER CODE END CAN2_Init 0 */
+  /* USER CODE END USART2_Init 0 */
 
-  /* USER CODE BEGIN CAN2_Init 1 */
+  /* USER CODE BEGIN USART2_Init 1 */
 
-  /* USER CODE END CAN2_Init 1 */
-  hcan2.Instance = CAN2;
-  hcan2.Init.Prescaler = 6;
-  hcan2.Init.Mode = CAN_MODE_NORMAL;
-  hcan2.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan2.Init.TimeSeg1 = CAN_BS1_6TQ;
-  hcan2.Init.TimeSeg2 = CAN_BS2_7TQ;
-  hcan2.Init.TimeTriggeredMode = DISABLE;
-  hcan2.Init.AutoBusOff = DISABLE;
-  hcan2.Init.AutoWakeUp = DISABLE;
-  hcan2.Init.AutoRetransmission = DISABLE;
-  hcan2.Init.ReceiveFifoLocked = DISABLE;
-  hcan2.Init.TransmitFifoPriority = DISABLE;
-  if (HAL_CAN_Init(&hcan2) != HAL_OK)
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 9600;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_ODD;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN CAN2_Init 2 */
-  /* CAN filter configuration for CAN2 */
-    CAN_FilterTypeDef canFilterConfig;
-    canFilterConfig.FilterActivation = ENABLE;
-    canFilterConfig.FilterBank = 1; // Use a different bank for CAN2
-    canFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-    canFilterConfig.FilterIdHigh = 0x0000;
-    canFilterConfig.FilterIdLow = 0x0000;
-    canFilterConfig.FilterMaskIdHigh = 0x0000;
-    canFilterConfig.FilterMaskIdLow = 0x0000;
-    canFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-    canFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-    if (HAL_CAN_ConfigFilter(&hcan2, &canFilterConfig) != HAL_OK)
-    {
-        // Filter configuration Error
-        Error_Handler();
-    }
+  /* USER CODE BEGIN USART2_Init 2 */
 
-    /* Start the CAN peripheral */
-    if (HAL_CAN_Start(&hcan2) != HAL_OK)
-    {
-        // Start Error
-        Error_Handler();
-    }
-
-    /* Activate CAN notifications */
-    if (HAL_CAN_ActivateNotification(&hcan2, CAN_IT_TX_MAILBOX_EMPTY) != HAL_OK)
-    {
-        // Notification Error
-        Error_Handler();
-    }
-
-    /* Transmission via CAN2 */
-    CAN_TxHeaderTypeDef TxHeader;
-    uint32_t TxMailbox;
-    uint8_t TxData[8] = {0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10}; // Example data for CAN2
-
-    TxHeader.DLC = 8; // Data length
-    TxHeader.IDE = CAN_ID_STD; // Using standard identifier
-    TxHeader.StdId = 0x524; // Standard identifier of the message for CAN2
-    TxHeader.RTR = CAN_RTR_DATA; // Message is a data frame
-
-    if (HAL_CAN_AddTxMessage(&hcan2, &TxHeader, TxData, &TxMailbox) != HAL_OK)
-    {
-        // Transmission request Error
-        Error_Handler();
-    }
-  /* USER CODE END CAN2_Init 2 */
+  /* USER CODE END USART2_Init 2 */
 
 }
 
-static uint32_t HAL_RCC_CAN1_CLK_ENABLED=0;
-
-void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
+void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(canHandle->Instance==CAN1)
+  if(uartHandle->Instance==USART1)
   {
-  /* USER CODE BEGIN CAN1_MspInit 0 */
+  /* USER CODE BEGIN USART1_MspInit 0 */
 
-  /* USER CODE END CAN1_MspInit 0 */
-    /* CAN1 clock enable */
-    HAL_RCC_CAN1_CLK_ENABLED++;
-    if(HAL_RCC_CAN1_CLK_ENABLED==1){
-      __HAL_RCC_CAN1_CLK_ENABLE();
-    }
+  /* USER CODE END USART1_MspInit 0 */
+    /* USART1 clock enable */
+    __HAL_RCC_USART1_CLK_ENABLE();
 
-    __HAL_RCC_GPIOD_CLK_ENABLE();
-    /**CAN1 GPIO Configuration
-    PD0     ------> CAN1_RX
-    PD1     ------> CAN1_TX
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    /**USART1 GPIO Configuration
+    PA9     ------> USART1_TX
+    PA10     ------> USART1_RX
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
+    GPIO_InitStruct.Pin = GPIO_PIN_9|GPIO_PIN_10;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF9_CAN1;
-    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    /* CAN1 interrupt Init */
-    HAL_NVIC_SetPriority(CAN1_TX_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(CAN1_TX_IRQn);
-    HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn);
-    HAL_NVIC_SetPriority(CAN1_RX1_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(CAN1_RX1_IRQn);
-    HAL_NVIC_SetPriority(CAN1_SCE_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(CAN1_SCE_IRQn);
-  /* USER CODE BEGIN CAN1_MspInit 1 */
+    /* USART1 interrupt Init */
+    HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USART1_IRQn);
+  /* USER CODE BEGIN USART1_MspInit 1 */
 
-  /* USER CODE END CAN1_MspInit 1 */
+  /* USER CODE END USART1_MspInit 1 */
   }
-  else if(canHandle->Instance==CAN2)
+  else if(uartHandle->Instance==USART2)
   {
-  /* USER CODE BEGIN CAN2_MspInit 0 */
+  /* USER CODE BEGIN USART2_MspInit 0 */
 
-  /* USER CODE END CAN2_MspInit 0 */
-    /* CAN2 clock enable */
-    __HAL_RCC_CAN2_CLK_ENABLE();
-    HAL_RCC_CAN1_CLK_ENABLED++;
-    if(HAL_RCC_CAN1_CLK_ENABLED==1){
-      __HAL_RCC_CAN1_CLK_ENABLE();
-    }
+  /* USER CODE END USART2_MspInit 0 */
+    /* USART2 clock enable */
+    __HAL_RCC_USART2_CLK_ENABLE();
 
-    __HAL_RCC_GPIOB_CLK_ENABLE();
-    /**CAN2 GPIO Configuration
-    PB5     ------> CAN2_RX
-    PB6     ------> CAN2_TX
+    __HAL_RCC_GPIOD_CLK_ENABLE();
+    /**USART2 GPIO Configuration
+    PD5     ------> USART2_TX
+    PD6     ------> USART2_RX
     */
     GPIO_InitStruct.Pin = GPIO_PIN_5|GPIO_PIN_6;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF9_CAN2;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-    /* CAN2 interrupt Init */
-    HAL_NVIC_SetPriority(CAN2_TX_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(CAN2_TX_IRQn);
-    HAL_NVIC_SetPriority(CAN2_RX0_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(CAN2_RX0_IRQn);
-    HAL_NVIC_SetPriority(CAN2_RX1_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(CAN2_RX1_IRQn);
-    HAL_NVIC_SetPriority(CAN2_SCE_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(CAN2_SCE_IRQn);
-  /* USER CODE BEGIN CAN2_MspInit 1 */
+    /* USART2 interrupt Init */
+    HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USART2_IRQn);
+  /* USER CODE BEGIN USART2_MspInit 1 */
 
-  /* USER CODE END CAN2_MspInit 1 */
+  /* USER CODE END USART2_MspInit 1 */
   }
 }
 
-void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
+void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 {
 
-  if(canHandle->Instance==CAN1)
+  if(uartHandle->Instance==USART1)
   {
-  /* USER CODE BEGIN CAN1_MspDeInit 0 */
+  /* USER CODE BEGIN USART1_MspDeInit 0 */
 
-  /* USER CODE END CAN1_MspDeInit 0 */
+  /* USER CODE END USART1_MspDeInit 0 */
     /* Peripheral clock disable */
-    HAL_RCC_CAN1_CLK_ENABLED--;
-    if(HAL_RCC_CAN1_CLK_ENABLED==0){
-      __HAL_RCC_CAN1_CLK_DISABLE();
-    }
+    __HAL_RCC_USART1_CLK_DISABLE();
 
-    /**CAN1 GPIO Configuration
-    PD0     ------> CAN1_RX
-    PD1     ------> CAN1_TX
+    /**USART1 GPIO Configuration
+    PA9     ------> USART1_TX
+    PA10     ------> USART1_RX
     */
-    HAL_GPIO_DeInit(GPIOD, GPIO_PIN_0|GPIO_PIN_1);
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9|GPIO_PIN_10);
 
-    /* CAN1 interrupt Deinit */
-    HAL_NVIC_DisableIRQ(CAN1_TX_IRQn);
-    HAL_NVIC_DisableIRQ(CAN1_RX0_IRQn);
-    HAL_NVIC_DisableIRQ(CAN1_RX1_IRQn);
-    HAL_NVIC_DisableIRQ(CAN1_SCE_IRQn);
-  /* USER CODE BEGIN CAN1_MspDeInit 1 */
+    /* USART1 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(USART1_IRQn);
+  /* USER CODE BEGIN USART1_MspDeInit 1 */
 
-  /* USER CODE END CAN1_MspDeInit 1 */
+  /* USER CODE END USART1_MspDeInit 1 */
   }
-  else if(canHandle->Instance==CAN2)
+  else if(uartHandle->Instance==USART2)
   {
-  /* USER CODE BEGIN CAN2_MspDeInit 0 */
+  /* USER CODE BEGIN USART2_MspDeInit 0 */
 
-  /* USER CODE END CAN2_MspDeInit 0 */
+  /* USER CODE END USART2_MspDeInit 0 */
     /* Peripheral clock disable */
-    __HAL_RCC_CAN2_CLK_DISABLE();
-    HAL_RCC_CAN1_CLK_ENABLED--;
-    if(HAL_RCC_CAN1_CLK_ENABLED==0){
-      __HAL_RCC_CAN1_CLK_DISABLE();
-    }
+    __HAL_RCC_USART2_CLK_DISABLE();
 
-    /**CAN2 GPIO Configuration
-    PB5     ------> CAN2_RX
-    PB6     ------> CAN2_TX
+    /**USART2 GPIO Configuration
+    PD5     ------> USART2_TX
+    PD6     ------> USART2_RX
     */
-    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_5|GPIO_PIN_6);
+    HAL_GPIO_DeInit(GPIOD, GPIO_PIN_5|GPIO_PIN_6);
 
-    /* CAN2 interrupt Deinit */
-    HAL_NVIC_DisableIRQ(CAN2_TX_IRQn);
-    HAL_NVIC_DisableIRQ(CAN2_RX0_IRQn);
-    HAL_NVIC_DisableIRQ(CAN2_RX1_IRQn);
-    HAL_NVIC_DisableIRQ(CAN2_SCE_IRQn);
-  /* USER CODE BEGIN CAN2_MspDeInit 1 */
+    /* USART2 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(USART2_IRQn);
+  /* USER CODE BEGIN USART2_MspDeInit 1 */
 
-  /* USER CODE END CAN2_MspDeInit 1 */
+  /* USER CODE END USART2_MspDeInit 1 */
   }
 }
 
-/* USER CODE BEGIN 1 не работает эхо */
-void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1)
-{
-    CAN_RxHeaderTypeDef RxHeader;
-    uint8_t RxData[8];
+/* USER CODE BEGIN 1 */
 
-    if (HAL_CAN_GetRxMessage(hcan1, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
-    {
-        Error_Handler();
-    }
 
-    // Forward the received CAN2 message to CAN1
-    CAN_TxHeaderTypeDef TxHeader;
-    uint32_t TxMailbox;
-
-    TxHeader.DLC = RxHeader.DLC;
-    TxHeader.IDE = RxHeader.IDE;
-    TxHeader.StdId = RxHeader.StdId;
-    TxHeader.RTR = RxHeader.RTR;
-
-    if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, RxData, &TxMailbox) != HAL_OK)
-    {
-        Error_Handler();
-    }
-}
 /* USER CODE END 1 */
