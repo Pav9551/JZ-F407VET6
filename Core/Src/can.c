@@ -93,7 +93,7 @@ void MX_CAN1_Init(void)
 
       TxHeader.DLC = 8;  // Data length
       TxHeader.IDE = CAN_ID_STD;  // Using standard identifier
-      TxHeader.StdId = 0x523;  // Standard identifier of the message
+      TxHeader.StdId = 0x423;  // Standard identifier of the message
       TxHeader.RTR = CAN_RTR_DATA;  // Message is a data frame
 
       if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, TxData, &TxMailbox) != HAL_OK)
@@ -101,6 +101,7 @@ void MX_CAN1_Init(void)
           // Transmission request Error
           Error_Handler();
       }
+      HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_ERROR | CAN_IT_BUSOFF | CAN_IT_LAST_ERROR_CODE);
   /* USER CODE END CAN1_Init 2 */
 }
 /* CAN2 init function */
@@ -131,52 +132,7 @@ void MX_CAN2_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN CAN2_Init 2 */
-  /* CAN filter configuration for CAN2 */
-    CAN_FilterTypeDef canFilterConfig;
-    canFilterConfig.FilterActivation = ENABLE;
-    canFilterConfig.FilterBank = 1; // Use a different bank for CAN2
-    canFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-    canFilterConfig.FilterIdHigh = 0x0000;
-    canFilterConfig.FilterIdLow = 0x0000;
-    canFilterConfig.FilterMaskIdHigh = 0x0000;
-    canFilterConfig.FilterMaskIdLow = 0x0000;
-    canFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-    canFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-    if (HAL_CAN_ConfigFilter(&hcan2, &canFilterConfig) != HAL_OK)
-    {
-        // Filter configuration Error
-        Error_Handler();
-    }
 
-    /* Start the CAN peripheral */
-    if (HAL_CAN_Start(&hcan2) != HAL_OK)
-    {
-        // Start Error
-        Error_Handler();
-    }
-
-    /* Activate CAN notifications */
-    if (HAL_CAN_ActivateNotification(&hcan2, CAN_IT_TX_MAILBOX_EMPTY) != HAL_OK)
-    {
-        // Notification Error
-        Error_Handler();
-    }
-
-    /* Transmission via CAN2 */
-    CAN_TxHeaderTypeDef TxHeader;
-    uint32_t TxMailbox;
-    uint8_t TxData[8] = {0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10}; // Example data for CAN2
-
-    TxHeader.DLC = 8; // Data length
-    TxHeader.IDE = CAN_ID_STD; // Using standard identifier
-    TxHeader.StdId = 0x524; // Standard identifier of the message for CAN2
-    TxHeader.RTR = CAN_RTR_DATA; // Message is a data frame
-
-    if (HAL_CAN_AddTxMessage(&hcan2, &TxHeader, TxData, &TxMailbox) != HAL_OK)
-    {
-        // Transmission request Error
-        Error_Handler();
-    }
   /* USER CODE END CAN2_Init 2 */
 
 }
@@ -320,29 +276,15 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
   }
 }
 
-/* USER CODE BEGIN 1 не работает эхо */
-void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1)
+/* USER CODE BEGIN 1 */
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
     CAN_RxHeaderTypeDef RxHeader;
-    uint8_t RxData[8];
-
-    if (HAL_CAN_GetRxMessage(hcan1, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
+    uint8_t RxData[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};  // Example data
+    if(HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) == HAL_OK)
     {
-        Error_Handler();
-    }
-
-    // Forward the received CAN2 message to CAN1
-    CAN_TxHeaderTypeDef TxHeader;
-    uint32_t TxMailbox;
-
-    TxHeader.DLC = RxHeader.DLC;
-    TxHeader.IDE = RxHeader.IDE;
-    TxHeader.StdId = RxHeader.StdId;
-    TxHeader.RTR = RxHeader.RTR;
-
-    if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, RxData, &TxMailbox) != HAL_OK)
-    {
-        Error_Handler();
+        HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_13);
     }
 }
+
 /* USER CODE END 1 */
